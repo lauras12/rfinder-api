@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS findText;
+DROP TABLE IF EXISTS findChecked; 
