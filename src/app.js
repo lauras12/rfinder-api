@@ -15,7 +15,7 @@ app.use(cors());
 app.use('/api.yelp.com/v3/businesses/search?', proxy)
 
 app.get('/', (req, res) => {
-    res.json('hello from restaurant finder!')
+    res.json('hello from Restaurant Finder!')
 });
 
 app.use(function errorHandler(error, req, res, next) {
