@@ -1,9 +1,7 @@
 const axios = require('axios')
 
 
-module.exports = (req, res) => {
-    const { term, location } = req.query;
-    console.log(term, location, 'its working')
+module.exports = (term, location) => {
 
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Accept",
@@ -17,7 +15,7 @@ module.exports = (req, res) => {
             'Authorization': 'bearer pCzcyRwsJ4cqsP9asMZ7VJJbBSrzy_CNLLUX0hUyj26uAZ3_5NcJMLC-DtJt1il1FT1WlosQ-mEopYjyLJWvYFmPXrVpIbGazzY_OP_XPATgB5kbd9tgNy6RJKw_YHYx',
         },
         responseType: 'stream'
-    })
+    }) 
         .then(response => {
             if (response.status === 200) {
                 res.writeHead(200, {
