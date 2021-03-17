@@ -1,11 +1,11 @@
 const PlacesService = {
-    getAllGreenPlaces: (knex) => {
+    getAllRestaurantPlaces: (knex) => {
         return knex
             .from('place')
             .select('*')   
     },
 
-    getAllGreenPlacesByUser: (knex, userId) => {
+    getAllRestaurantPlacesByUser: (knex, userId) => {
         return knex.from('place').select('*').where('userid', userId)
     },
 
@@ -19,6 +19,7 @@ const PlacesService = {
             return rows[0]
         })
     },
+
     updateRestaurantPlace: (knex,userId, placeId, updatedFields) => {
         return knex('place').where({userid: userId, id: placeId}).update(updatedFields).returning('*')
         .then((rows) => {
@@ -26,7 +27,6 @@ const PlacesService = {
             return rows; //update returns number of updated rows
         })
     },
-
 
     deleteReviewedPlace: (knex, userId, place_id) => {
         console.log(userId, place_id)

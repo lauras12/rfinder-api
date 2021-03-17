@@ -57,9 +57,9 @@ const ReviewsService = {
             )
     },
 
-    getReviewByPlaceId:  (knex, userId, placeId) => {
+    getReviewByPlaceId: (knex, userId, placeId) => {
         return knex
-        .from('review AS rev')
+            .from('review AS rev')
             .select(
                 'rev.id',
                 'rev.userid',
@@ -85,52 +85,55 @@ const ReviewsService = {
                     'rev.placeid': placeId,
                 }
             )
-            
+
+
     },
 
     insertNewReview: (knex, newReview) => {
         return knex.into('review').insert(newReview).returning('*')
-        .then(rows =>{
-            console.log(rows, 'ROWS')
-            return rows[0];
-        })
+            .then(rows => {
+                console.log(rows, 'ROWS')
+                return rows[0];
+            })
     },
 
     insertNewCheckedFind: (knex, newCheckedFind) => {
         return knex.into('findchecked').insert(newCheckedFind).returning('*')
-        .then(rows => {
-            return rows[0];
-        })
+            .then(rows => {
+                return rows[0];
+            })
     },
 
     updateReview: (knex, userId, placeId, updatedFields) => {
-        console.log(updatedFields, 'HERE???>>>>>>>>>')
-        return knex.into('review').where({userid: userId, placeid: placeId}).update(updatedFields).returning('*')
-        .then(rows => {
-            return rows[0];
-        })
+        //console.log(updatedFields, 'HERE???>>>>>>>>>')
+        return knex('review').where({ userid: userId, placeid: placeId }).update(updatedFields).returning('*')
+            .then(rows => {
+                return rows[0];
+            })
     },
 
-    updateFindChecked: (knex, userId, placeId, updatedFields) => {
-        console.log(updatedFields, 'UPDATED IN SERVICE')
-        return knex.into('findchecked').where({userid: userId, placeid: placeId}).update(updatedFields).returning('*')
-        .then(rows => {
-            return rows;
-        })
+    updateFindChecked: (knex, userId, placeId, updatedList) => {
+        return knex.into('findchecked').where({ userid: userId, placeid: placeId }).del()
+            .then(() => {
+                return knex.into('findchecked').insert(updatedList).returning('*')
+            })
+            .then(rows => {
+                return rows;
+        })//insert can insert one obj or an array /// dont nest THENS!
     },
 
     deleteReview: (knex, userId, placeToRemove) => {
-        return knex.from('review').select('*').where({userid: userId, placeid: placeToRemove}).delete()
-        .then((rows) => {
-            console.log(rows,'???????.........222222222>>>>?????????')
-        } )
+        return knex.from('review').select('*').where({ userid: userId, placeid: placeToRemove }).del()
+            .then((rows) => {
+                console.log(rows, '???????.........222222222>>>>?????????')
+            })
     },
 
     deleteCheckedFind: (knex, userId, placeToRemove) => {
-        return knex.from('findchecked').select('*').where({userid: userId, placeid: placeToRemove}).delete()
-        .then((rows) => {
-            console.log(rows,'???????>>>>>>>?????????')
-        } )
+        return knex.from('findchecked').select('*').where({ userid: userId, placeid: placeToRemove }).del()
+            .then((rows) => {
+                console.log(rows, '???????>>>>>>>?????????')
+            })
     }
 
 }

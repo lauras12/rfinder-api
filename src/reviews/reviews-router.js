@@ -171,7 +171,7 @@ reviewsRouter //updating a reviewed place
                 let find = await ReviewsService.updateFindChecked(knexInstance, user_id, restaurant_place_id, updatedFindsList)
                 // .then(find => {
                     updatedFindsList.push(find)
-                    console.log(find, 'FINDSSSSSSSSSS')
+                    console.log(find, 'TNUMBSSSSSSSSSS')
                 // })
                 // .catch(next)
             
