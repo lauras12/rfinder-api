@@ -16,7 +16,6 @@ function requireAuth(req,res,next) {
         
         AuthService.getUserWithUserName(knexInstance, payload.sub)
         .then(user => {
-            console.log(user, 'DO I EXIST????', payload)
             if(!user) {
                 return res.status(401).json({error: {message: 'Unauthorized request'}})
             }

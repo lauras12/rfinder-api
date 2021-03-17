@@ -29,7 +29,7 @@ const makeTestPlaces = () => {
             name: 'first place',
             img_url: 'image1',
             url: 'yelpUrl',
-            yelp_rating: 4.5,
+            yelp_rating: 5,
             location_str: '1 street',
             location_city: 'cityFirst',
             location_zip: '012345',
@@ -75,7 +75,6 @@ const makeTestReviews = () => {
             place_id: 1,
             place_category: 'category1',
             review: 'first review',
-            date: '2019-01-22T16:28:32.615Z'
         },
         {
             id:2,
@@ -83,7 +82,6 @@ const makeTestReviews = () => {
             place_id: 1,
             place_category: 'category1',
             review: 'second review',
-            date: '2019-01-22T16:28:32.615Z'
            
         },
         {
@@ -92,7 +90,6 @@ const makeTestReviews = () => {
             place_id: 3,
             review: 'third review',
             place_category: 'category1',
-            date: '2019-01-22T16:28:32.615Z'
         },
         {
             id:4,
@@ -100,7 +97,6 @@ const makeTestReviews = () => {
             place_id: 2,
             place_category: 'category2',
             review: 'fourth review',
-            date: '2019-01-22T16:28:32.615Z'
         },
     ]
 }
