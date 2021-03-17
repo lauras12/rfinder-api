@@ -8,6 +8,7 @@ const ReviewsService = {
                 'rev.place_id',
                 'rev.review',
                 'rev.date',
+                'rev.place_category',
                 'thc.find',
                 'th.description'
             )
@@ -36,6 +37,7 @@ const ReviewsService = {
                 'rev.place_id',
                 'rev.review',
                 'rev.date',
+                'rev.place_category',
                 'thc.find',
                 'th.description'
             )
@@ -66,6 +68,7 @@ const ReviewsService = {
                 'rev.place_id',
                 'rev.review',
                 'rev.date',
+                'rev.place_category',
                 'thc.find',
                 'th.description'
             )
@@ -88,11 +91,18 @@ const ReviewsService = {
 
 
     },
+    getReviewCountPerPlace: (knex, yelp_id) => {
+        return knex.from('review').select('*').where({yelp_id: yelp_id})
+        .then(rows => {
+            console.log(rows, 'REVIEWS FOR THIS PLACE??????')
+            return rows;
+        })
+    },
+
 
     insertNewReview: (knex, newReview) => {
         return knex.into('review').insert(newReview).returning('*')
             .then(rows => {
-                console.log(rows, 'ROWS')
                 return rows[0];
             })
     },
@@ -100,15 +110,16 @@ const ReviewsService = {
     insertNewCheckedFind: (knex, newCheckedFind) => {
         return knex.into('findchecked').insert(newCheckedFind).returning('*')
             .then(rows => {
-                return rows[0];
+                return rows;
             })
     },
 
     updateReview: (knex, userId, placeId, updatedFields) => {
-        //console.log(updatedFields, 'HERE???>>>>>>>>>')
+        console.log(updatedFields, 'HERE???>>>>>>>>>', userId, placeId)
         return knex('review').where({ userid: userId, place_id: placeId }).update(updatedFields).returning('*')
             .then(rows => {
-                return rows[0];
+                console.log(rows, "ROWS",rows[0],"AT 0" )
+                return rows;
             })
     },
 

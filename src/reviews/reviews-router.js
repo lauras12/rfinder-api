@@ -15,15 +15,20 @@ reviewsRouter
         try {
             const knexInstance = req.app.get('db');
             const user_id = req.user.id;
+            const yelpId = req.params.place_id;
 
-            //const yelpId = req.params.place_id;
-            const { yelp_id, name, img, url, yelp_rating, location_str, location_city, location_zip, location_st, display_phone, restaurant_reviews_count, category, price, userid, review, checkedFinds } = req.body;
+            console.log(req.user, user_id)
+            const { yelp_id, name, img, url, yelp_rating, location_str, location_city, location_zip, location_st, display_phone, restaurant_reviews_count, category, price, userid, review, checkedfinds } = req.body;
             for (const [key, value] of Object.entries(req.body)) {
                 if (value === null) {
                     return res.status(400).send({ error: { message: `Missing ${key}` } });
                 }
             }
-            //checkedFinds is an array of numbers referring to ids of find text
+            let existingUserReviewedPlace = await PlacesService.getPlaceByYelpId(knexInstance, user_id, yelpId)
+            if (existingUserReviewedPlace) {
+                return res.status(400).send({ error: { message: `You have already reviewed this place` } });
+            }
+            //checkedfinds is an array of numbers referring to ids of find text
             // need to save place first, then review so db assigns placeId and reviewId, then call db to get those ids and create findChecked obj with them
             let newRestaurantPlace = {
                 yelp_id,
@@ -51,24 +56,24 @@ reviewsRouter
             let savedReview = await ReviewsService.insertNewReview(knexInstance, newReview)
 
 
-            checkedFinds.forEach(el => {
-                let newCheckedFind = {
+            checkedfinds.forEach(el => {
+                let newCheckedfind = {
                     userid: user_id,
                     place_id: savedPlace.id,
                     review_id: savedReview.id,
                     find: el
                 }
-                ReviewsService.insertNewCheckedFind(knexInstance, newCheckedFind)
-                    .then(newFind => {
-                        console.log(newFind)
+                ReviewsService.insertNewCheckedfind(knexInstance, newCheckedfind)
+                    .then(newfind => {
+                        console.log(newfind)
                     })
 
             })
 
 
-            console.log({ newRestaurantPlace, newReview, checkedFinds }, "RETURNING TO CLIENT")
+            console.log({ newRestaurantPlace, newReview, checkedfinds }, "RETURNING TO CLIENT")
             console.log(req.originalUrl, `/${savedPlace.id}`)
-            return res.json(201).json({ newRestaurantPlace, newReview, checkedFinds }).location(path.posix.join(req.originalUrl, `/${savedPlace.id}`))
+            return res.json(201).json({ newRestaurantPlace, newReview, checkedfinds }).location(path.posix.join(req.originalUrl, `/${savedPlace.id}`))
 
 
         } catch (err) {
@@ -89,14 +94,9 @@ reviewsRouter //updating a reviewed place
                 yelp_id, name, img, url, yelp_rating, 
                 location_str, location_city, location_zip, 
                 location_st, display_phone, 
-                restaurant_reviews_count, category, review, checkedFinds 
+                restaurant_reviews_count, category, review, checkedfinds 
             } = req.body;
 
-            // for (const [key, value] of Object.entries(req.body)) {
-            //     if (value === null) {
-            //         return res.status(400).send({ error: { message: `Missing ${key}` } });
-            //     }
-            // }
 
 // in future should call proxy here to get place's info again in order to ensure that if the place's address or other info was not changed in yelp it gets updated in restaurant finds up as well.....
             let updatedPlaceInfo = {
@@ -126,20 +126,20 @@ reviewsRouter //updating a reviewed place
             const updatedPlace = await PlacesService.updateRestaurantPlace(knexInstance, user_id, restaurant_place_id, updatedPlaceInfo);
             const updatedReview = await ReviewsService.updateReview(knexInstance, user_id, restaurant_place_id, updatedReviewInfo);
 
-            checkedFinds.forEach(el => {
-                let updatedCheckedFindInfo = {
+            checkedfinds.forEach(el => {
+                let updatedCheckedfindInfo = {
                     userid: user_id,
                     place_id: restaurant_place_id,
                     review_id: updatedReview.id,
                     find: el
                 }
-                ReviewsService.updateFindChecked(knexInstance, user_id, restaurant_place_id, updatedCheckedFindInfo)
+                ReviewsService.updatefindChecked(knexInstance, user_id, restaurant_place_id, updatedCheckedfindInfo)
                     .then(find => {
                         console.log(find, 'TNUMBSSSSSSSSSS')
                     });
             });
 
-            return res.json(201).json({ updatedPlace, updatedReview, checkedFinds }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`));
+            return res.json(201).json({ updatedPlace, updatedReview, checkedfinds }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`));
 
         } catch (err) {
             next(err);
