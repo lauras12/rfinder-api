@@ -5,7 +5,7 @@ const ReviewsService = {
             .select(
                 'rev.id',
                 'rev.userid',
-                'rev.placeid',
+                'rev.place_id',
                 'rev.review',
                 'rev.date',
                 'thc.find',
@@ -13,8 +13,8 @@ const ReviewsService = {
             )
             .join(
                 'findchecked AS thc',
-                'rev.placeid',
-                'thc.placeid'
+                'rev.place_id',
+                'thc.place_id'
             )
             .join(
                 'findtext AS th',
@@ -22,7 +22,7 @@ const ReviewsService = {
                 'th.id'
             )
             .where(
-                { 'rev.placeid': placeId }
+                { 'rev.place_id': placeId }
             )
 
     },
@@ -33,7 +33,7 @@ const ReviewsService = {
             .select(
                 'rev.id',
                 'rev.userid',
-                'rev.placeid',
+                'rev.place_id',
                 'rev.review',
                 'rev.date',
                 'thc.find',
@@ -41,8 +41,8 @@ const ReviewsService = {
             )
             .join(
                 'findchecked AS thc',
-                'rev.placeid',
-                'thc.placeid'
+                'rev.place_id',
+                'thc.place_id'
             )
             .join(
                 'findtext AS th',
@@ -52,7 +52,7 @@ const ReviewsService = {
             .where(
                 {
                     'rev.userid': userId,
-                    'rev.placeid': placeId,
+                    'rev.place_id': placeId,
                 }
             )
     },
@@ -63,7 +63,7 @@ const ReviewsService = {
             .select(
                 'rev.id',
                 'rev.userid',
-                'rev.placeid',
+                'rev.place_id',
                 'rev.review',
                 'rev.date',
                 'thc.find',
@@ -71,8 +71,8 @@ const ReviewsService = {
             )
             .join(
                 'findchecked AS thc',
-                'rev.placeid',
-                'thc.placeid'
+                'rev.place_id',
+                'thc.place_id'
             )
             .join(
                 'findtext AS th',
@@ -82,7 +82,7 @@ const ReviewsService = {
             .where(
                 {
                     'rev.userid': userId,
-                    'rev.placeid': placeId,
+                    'rev.place_id': placeId,
                 }
             )
 
@@ -106,14 +106,14 @@ const ReviewsService = {
 
     updateReview: (knex, userId, placeId, updatedFields) => {
         //console.log(updatedFields, 'HERE???>>>>>>>>>')
-        return knex('review').where({ userid: userId, placeid: placeId }).update(updatedFields).returning('*')
+        return knex('review').where({ userid: userId, place_id: placeId }).update(updatedFields).returning('*')
             .then(rows => {
                 return rows[0];
             })
     },
 
     updateFindChecked: (knex, userId, placeId, updatedList) => {
-        return knex.into('findchecked').where({ userid: userId, placeid: placeId }).del()
+        return knex.into('findchecked').where({ userid: userId, place_id: placeId }).del()
             .then(() => {
                 return knex.into('findchecked').insert(updatedList).returning('*')
             })
@@ -123,14 +123,14 @@ const ReviewsService = {
     },
 
     deleteReview: (knex, userId, placeToRemove) => {
-        return knex.from('review').select('*').where({ userid: userId, placeid: placeToRemove }).del()
+        return knex.from('review').select('*').where({ userid: userId, place_id: placeToRemove }).del()
             .then((rows) => {
                 console.log(rows, '???????.........222222222>>>>?????????')
             })
     },
 
     deleteCheckedFind: (knex, userId, placeToRemove) => {
-        return knex.from('findchecked').select('*').where({ userid: userId, placeid: placeToRemove }).del()
+        return knex.from('findchecked').select('*').where({ userid: userId, place_id: placeToRemove }).del()
             .then((rows) => {
                 console.log(rows, '???????>>>>>>>?????????')
             })
