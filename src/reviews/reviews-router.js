@@ -16,70 +16,114 @@ reviewsRouter
             const knexInstance = req.app.get('db');
             const user_id = req.user.id;
             const yelpId = req.params.place_id;
-
-            console.log(req.user, user_id)
-            const { yelp_id, name, img, url, yelp_rating, location_str, location_city, location_zip, location_st, display_phone, restaurant_reviews_count, category, price, userid, review, checkedfinds } = req.body;
+            
+            const { yelp_id, name, img, url, yelp_rating, location_str, location_city, location_zip, location_st, display_phone, restaurant_reviews_count, category, review, checkedFinds } = req.body;
             for (const [key, value] of Object.entries(req.body)) {
                 if (value === null) {
                     return res.status(400).send({ error: { message: `Missing ${key}` } });
                 }
             }
-            let existingUserReviewedPlace = await PlacesService.getPlaceByYelpId(knexInstance, user_id, yelpId)
-            if (existingUserReviewedPlace) {
-                return res.status(400).send({ error: { message: `You have already reviewed this place` } });
+            const existingReviewByUser = await PlacesService.getUserInUserPlace(knexInstance, user_id, yelpId )
+            if(existingReviewByUser) {
+                return res.status(400).send({error: {message: `your review already exists`}})
             }
-            //checkedfinds is an array of numbers referring to ids of find text
-            // need to save place first, then review so db assigns placeId and reviewId, then call db to get those ids and create findChecked obj with them
-            let newRestaurantPlace = {
-                yelp_id,
-                name,
-                img_url:img,
-                url,
-                yelp_rating,
-                location_str,
-                location_city,
-                location_zip,
-                location_st,
-                display_phone,
-                userid: user_id,
-                category,
-                restaurant_reviews_count,
-            }
+            //first check if there's a place of this id in GREEN db, if not we will save the place info, but it it already exists we will just add another review and checked finds
+            const existingPlace = await PlacesService.getPlaceById(knexInstance, yelpId)
+             if (!existingPlace) {
+                 console.log('HERE?????? should bt')
+                let newRestaurantPlace = {
+                    yelp_id,
+                    name,
+                    img_url: img,
+                    url,
+                    yelp_rating,
+                    location_str,
+                    location_city,
+                    location_zip,
+                    location_st,
+                    display_phone,
+                    restaurant_reviews_count,
+                }
 
-            let savedPlace = await PlacesService.insertNewPlace(knexInstance, newRestaurantPlace)
-
-            let newReview = {
-                userid: user_id,
-                place_id: savedPlace.id,
-                review,
-            };
-            let savedReview = await ReviewsService.insertNewReview(knexInstance, newReview)
-
-
-            checkedfinds.forEach(el => {
-                let newCheckedfind = {
+                let savedPlace = await PlacesService.insertNewPlace(knexInstance, newRestaurantPlace)
+                
+                let newUserPlace = {
+                    userid: user_id,
+                    reviewed_place_id: savedPlace.id
+                }
+                let savedUserPlace= await PlacesService.insertNewUserPlace(knexInstance, newUserPlace )
+                console.log(savedUserPlace, savedPlace)
+                
+                let newReview = {
                     userid: user_id,
                     place_id: savedPlace.id,
-                    review_id: savedReview.id,
-                    find: el
+                    place_category: category,
+                    review,
+                };
+                let savedReview = await ReviewsService.insertNewReview(knexInstance, newReview)
+                console.log(savedReview)
+
+                checkedFinds.forEach(el => {
+                    let newCheckedFind = {
+                        userid: user_id,
+                        place_id: savedPlace.id,
+                        review_id: savedReview.id,
+                        find: el
+                    }
+                    ReviewsService.insertNewCheckedFind(knexInstance, newCheckedFind)
+                        .then(newFind => {
+                            console.log(newFind)
+                        })
+
+                })
+
+
+                console.log({ newRestaurantPlace, newReview, checkedFinds }, "RETURNING TO CLIENT")
+                console.log(req.originalUrl, `/${savedPlace.id}`)
+                return res.json(201).json({ newRestaurantPlace, newReview, checkedFinds }).location(path.posix.join(req.originalUrl, `/${newRestaurantPlace.id}`))
+
+            } else {
+                console.log(existingPlace, 'PLACACELLLLLLLLLLLL')
+                let newUserPlace = {
+                    userid: user_id,
+                    reviewed_place_id: existingPlace.id
                 }
-                ReviewsService.insertNewCheckedfind(knexInstance, newCheckedfind)
-                    .then(newfind => {
-                        console.log(newfind)
-                    })
+                
+                let savedUserPlace= await PlacesService.insertNewUserPlace(knexInstance, newUserPlace )
+                console.log(savedUserPlace,)
+                
+                let newReview = {
+                    userid: user_id,
+                    place_id: existingPlace.id,
+                    place_category: category,
+                    review,
+                };
+                let savedReview = await ReviewsService.insertNewReview(knexInstance, newReview)
+                console.log(savedReview)
 
-            })
+                checkedFinds.forEach(el => {
+                    let newCheckedFind = {
+                        userid: user_id,
+                        place_id: existingPlace.id,
+                        review_id: savedReview.id,
+                        find: el
+                    }
+                    ReviewsService.insertNewCheckedFind(knexInstance, newCheckedFind)
+                        .then(newFind => {
+                            console.log(newFind, 'FFFFF?????????')
+                        })
 
-
-            console.log({ newRestaurantPlace, newReview, checkedfinds }, "RETURNING TO CLIENT")
-            console.log(req.originalUrl, `/${savedPlace.id}`)
-            return res.json(201).json({ newRestaurantPlace, newReview, checkedfinds }).location(path.posix.join(req.originalUrl, `/${savedPlace.id}`))
-
-
+                })
+                //console.log(existingPlace, savedReview, 'SAVED REVIEW ')
+                return res.json(201).json({ newReview, checkedFinds }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`))
+            }
+                
         } catch (err) {
             next(err)
         }
     })
+
+
 
 
 reviewsRouter //updating a reviewed place
@@ -88,58 +132,58 @@ reviewsRouter //updating a reviewed place
     .all(jsonBodyParser, async (req, res, next) => {
         try {
             const knexInstance = req.app.get('db');
-            const restaurant_place_id = Number(req.params.restaurant_place_id);
+            const restaurant_place_id = req.params.restaurant_place_id;
             const user_id = req.user.id;
-            const { 
-                yelp_id, name, img, url, yelp_rating, 
-                location_str, location_city, location_zip, 
-                location_st, display_phone, 
-                restaurant_reviews_count, category, review, checkedfinds 
+            const {
+                yelp_id, name, img, url, yelp_rating,
+                location_str, location_city, location_zip,
+                location_st, display_phone,
+                restaurant_reviews_count, category, review, checkedFinds
             } = req.body;
+            console.log(user_id, restaurant_place_id ,'AM I HERE?????')
+           
 
-
-// in future should call proxy here to get place's info again in order to ensure that if the place's address or other info was not changed in yelp it gets updated in restaurant finds up as well.....
-            let updatedPlaceInfo = {
-                id: restaurant_place_id,
-                yelp_id,
-                name,
-                img_url:img,
-                url,
-                yelp_rating,
-                location_str,
-                location_city,
-                location_zip,
-                location_st,
-                display_phone,
-                userid: user_id,
-                restaurant_reviews_count,
-                category,
-            }
-
+            // in future should call proxy here to get place's info again in order to ensure that if the place's address or other info was not changed in yelp it gets updated in restaurant finds up as well.....
+            // let updatedPlaceInfo = {
+            //     id: restaurant_place_id,
+            //     yelp_id,
+            //     name,
+            //     img_url: img,
+            //     url,
+            //     yelp_rating,
+            //     location_str,
+            //     location_city,
+            //     location_zip,
+            //     location_st,
+            //     display_phone,
+            //     restaurant_reviews_count,
+            // }
+            
             const updatedReviewInfo = {
                 userid: user_id,
                 place_id: restaurant_place_id,
+                place_category: category,
                 date: new Date(),
                 review,
             };
-            
-            const updatedPlace = await PlacesService.updateRestaurantPlace(knexInstance, user_id, restaurant_place_id, updatedPlaceInfo);
-            const updatedReview = await ReviewsService.updateReview(knexInstance, user_id, restaurant_place_id, updatedReviewInfo);
 
-            checkedfinds.forEach(el => {
-                let updatedCheckedfindInfo = {
+            // const updatedPlace = await PlacesService.updateRestaurantPlace(knexInstance, user_id, restaurant_place_id, updatedPlaceInfo);
+            const updatedReview = await ReviewsService.updateReview(knexInstance, user_id, restaurant_place_id, updatedReviewInfo);
+            console.log(updatedReview, 'UPDATE???', updatedReview.id)
+            checkedFinds.forEach(el => {
+                let updatedCheckedFindInfo = {
                     userid: user_id,
                     place_id: restaurant_place_id,
                     review_id: updatedReview.id,
                     find: el
                 }
-                ReviewsService.updatefindChecked(knexInstance, user_id, restaurant_place_id, updatedCheckedfindInfo)
+                ReviewsService.updateFindChecked(knexInstance, user_id, restaurant_place_id, updatedCheckedFindInfo)
                     .then(find => {
                         console.log(find, 'TNUMBSSSSSSSSSS')
                     });
             });
 
-            return res.json(201).json({ updatedPlace, updatedReview, checkedfinds }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`));
+            return res.json(201).json({updatedReview, checkedFinds }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`));
 
         } catch (err) {
             next(err);
@@ -158,15 +202,16 @@ reviewsRouter
         const placeToRemove = Number(req.params.restaurant_place_id);
         console.log(userId, placeToRemove, req.user, 'IN DELETE')
         //how to determine that we cant delete a place if current user is not its author? => on front end
-        PlacesService.deleteReviewedPlace(knexInstance, userId, placeToRemove)
+        PlacesService.deleteUserPlace(knexInstance, userId, placeToRemove)
             .then(() => {
                 //delete the rest of info
-                return ReviewsService.deleteReview(knexInstance, userId, placeToRemove)
+                 ReviewsService.deleteReview(knexInstance, userId, placeToRemove)
+            //})
             })
             .then(() => {
                 console.log('DONE????')
                 return res.status(204).send('reviewed place deleted')
-            
+
             })
             .catch(next)
     })
