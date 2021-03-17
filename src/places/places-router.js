@@ -12,14 +12,14 @@ placesRouter // gets all restaurant find reviewed places with full info
             res.placesReviewed = [];
             const knexInstance = req.app.get('db')
             const places = await PlacesService.getAllRestaurantPlaces(knexInstance);
-
+           
             for (let i = 0; i < places.length; i++) {
                 const reviews = await ReviewsService.getAllReviews(knexInstance, places[i].id);
                 if (reviews) {
                     let reviewText = {};
                     let reviewDate = {};
                     let reviewCheckedFinds = {}
-
+                    console.log(reviews, 'REVIEWS')
                     reviews.forEach(rev => {
                         reviewText[rev.review] = true;
                         reviewDate[rev.date] = true;
@@ -29,8 +29,8 @@ placesRouter // gets all restaurant find reviewed places with full info
                     const {
                         id, yelpid, name, img_url, url, yelprating,
                         location_str, location_city, location_zip,
-                        location_st, phone, displayPhone, userId,
-                        folderId, restaurantReviewsCount
+                        location_st, phone, displayphone, userid,
+                        folderid, restaurant_reviews_count
                     } = places[i];
 
                     res.placesReviewed.push({
@@ -45,15 +45,16 @@ placesRouter // gets all restaurant find reviewed places with full info
                         location_zip,
                         location_st,
                         phone,
-                        displayPhone,
-                        userId,
-                        folderId,
-                        restaurantReviewsCount,
+                        displayphone,
+                        userid,
+                        folderid,
+                        restaurant_reviews_count,
                         review: Object.keys(reviewText),
                         reviewDate: Object.keys(reviewDate),
                         checkedFinds: Object.keys(reviewCheckedFinds)
                     });
                 };
+                
             };
             next();
         } catch (err) {
@@ -66,14 +67,15 @@ placesRouter // gets all restaurant find reviewed places with full info
 
 
 placesRouter
-    //gets restaurant reviewd places by user with full info
-    .route('/api/user/:user_id')
+    //gets restaurant reviewed places by user with full info
+    .route('/api/user/')
     .all(requireAuth)
     .all(async (req, res, next) => {
 
         try {
             const knexInstance = req.app.get('db');
-            const user_id = Number(req.params.user_id);
+            const user_id = Number(req.user.id);
+           console.log(user_id, 'TESTING USER???????')
             res.userPlacesReviewed = [];
             const userPlaces = await PlacesService.getAllRestaurantPlacesByUser(knexInstance, user_id)
 
@@ -94,8 +96,8 @@ placesRouter
                         const {
                             id, yelpid, name, img_url, url, yelprating,
                             location_str, location_city, location_zip,
-                            location_st, phone, displayPhone, userId,
-                            folderId, restaurantReviewsCount
+                            location_st, phone, displayphone, userid,
+                            folderid, restaurant_reviews_count
                         } = userPlaces[i];
 
                         res.userPlacesReviewed.push({
@@ -110,16 +112,16 @@ placesRouter
                             location_zip,
                             location_st,
                             phone,
-                            displayPhone,
-                            userId,
-                            folderId,
-                            restaurantReviewsCount,
+                            displayphone,
+                            userid,
+                            folderid,
+                            restaurant_reviews_count,
                             review: Object.keys(reviewText),
                             reviewDate: Object.keys(reviewDate),
                             checkedFinds: Object.keys(reviewCheckedFinds)
                         });
 
-                        console.log(res.userPlacesReviewed, 'HERE??????')
+                        //console.log(res.userPlacesReviewed, 'HERE??????')
                     };
                 };
             } else {
@@ -137,17 +139,20 @@ placesRouter
 
 placesRouter //gets by id reviewed place with full info
     .route('/api/place/:place_id')
+    .all(requireAuth)
     .all((req, res, next) => {
         const knexInstance = req.app.get('db');
-        const { place_id } = req.params;
-        PlacesService.getPlaceById(knexInstance, place_id)
+        const user_id = req.user.id
+        const place_id  = req.params.place_id;
+        
+        PlacesService.getPlaceById(knexInstance, user_id, place_id)
             .then(place => {
                 if (!place) {
-                    return res.status(404).send({ error: { message: `Place with id ${place_id} doesn't exist` } })
+                    return res.status(404).json({ error: { message: `User with id ${user_id} did not review place with id ${place_id}` } })
                 }
                 res.place = place
                 
-                ReviewsService.getReviewByPlaceId(knexInstance, place_id)
+                ReviewsService.getReviewByPlaceId(knexInstance, user_id, place_id)
                     .then(reviews => {
 
                         if (reviews) {
