@@ -141,64 +141,74 @@ reviewsRouter //updating a reviewed place
                 review,
             }
 
-        
-                let updatedReview;
-                let updatedCheckedFind;
-                let updatedPlace;
 
-                updatedPlace = await PlacesService.updateRestaurantPlace(knexInstance, user_id, restaurant_place_id, updatedPlaceInfo)
-                console.log(updatedPlace, 'FINISHED???????????')
+            let updatedReview;
+            let updatedCheckedFind;
+            let updatedPlace;
 
-                updatedReview = await ReviewsService.updateReview(knexInstance, user_id, restaurant_place_id, updatedReviewInfo)
-                console.log(updatedReview, 'FINISHED???222222222222????????')
+            updatedPlace = await PlacesService.updateRestaurantPlace(knexInstance, user_id, restaurant_place_id, updatedPlaceInfo)
+            console.log(updatedPlace, 'FINISHED???????????')
 
-               
-                checkedFinds.forEach(el => {
-                    let updatedCheckedFindInfo = {
-                         userid: user_id,
-                         placeid: restaurant_place_id,
-                         reviewid: updatedReview.id,
-                         find: el
-                     }
-                    ReviewsService.updateFindChecked(knexInstance, user_id, restaurant_place_id, updatedCheckedFindInfo)
-                     .then(find => {
-                         console.log(find, 'TNUMBSSSSSSSSSS')
-                     })
-                 })
-             
-                 return res.json(201).json({ updatedPlace, updatedReview, checkedFinds }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`))
+            updatedReview = await ReviewsService.updateReview(knexInstance, user_id, restaurant_place_id, updatedReviewInfo)
+            console.log(updatedReview, 'FINISHED???222222222222????????')
 
-            } catch (err) {
-                next(err)
-            }
-            next()
-        })
+            let updatedFindsList = [];
+            
+                for(let i = 0; i<checkedFinds.length; i++ ) {
+                
+                    let updatedFind = {
+                        userid: user_id,
+                        placeid: restaurant_place_id,
+                        reviewid: updatedReview.id,
+                        find: checkedFinds[i],
+                    }
+                    updatedFindsList.push(updatedFind);
+                    
+                }
+                console.log(updatedFindsList, "THUMBLISTTTTTTTTT")
+           
+            
+                let find = await ReviewsService.updateFindChecked(knexInstance, user_id, restaurant_place_id, updatedFindsList)
+                // .then(find => {
+                    updatedFindsList.push(find)
+                    console.log(find, 'FINDSSSSSSSSSS')
+                // })
+                // .catch(next)
+            
+            
+                
+                
+            
+
+            return res.status(201).json({ updatedPlace, updatedReview, updatedFindsList }).location(path.posix.join(req.originalUrl, `/${restaurant_place_id}`))
+
+        } catch (err) {
+            console.log(err,'ERROR')
+            next(err)
+        }
+        next()
+    })
 
 
 
 reviewsRouter
-    .route('/api/:user_id/review/:restaurant_place_id')
+    .route('/api/place/delete/:restaurant_place_id')
     .all(requireAuth)
     .delete((req, res, next) => {
         const knexInstance = req.app.get('db');
-        const userId = req.params.user_id;
+        const userId = req.user.id;
         const placeToRemove = req.params.restaurant_place_id;
-        //should I get by id first to make sure that if place does not exist I have an if statement????
+        console.log(userId, placeToRemove, req.user, 'IN DELETE')
+        //how to determine that we cant delete a place if current user is not its author? on front end
         PlacesService.deleteReviewedPlace(knexInstance, userId, placeToRemove)
             .then(() => {
                 //delete the rest of info
-                ReviewsService.deleteReview(knexInstance, userId, placeToRemove)
-                    .then(() => {
-                        console.log('DONE????')
-                        return res.status(204).send('reviewed place deleted')
-                        //   ReviewsService.deleteCheckedFind(knexInstance, userId, placeToRemove)
-                        //   .then(() => {
-                        //       return res.status(204).json('reviewed place deleted')
-                        //   })
-                        //   .catch(next)
-                    })
-                    //return res.status(204).send('reviewed place deleted')
-                    .catch(next)
+                return ReviewsService.deleteReview(knexInstance, userId, placeToRemove)
+            })
+            .then(() => {
+                console.log('DONE????')
+                return res.status(204).send('reviewed place deleted')
+            
             })
             .catch(next)
     })

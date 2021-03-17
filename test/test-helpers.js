@@ -41,13 +41,26 @@ function seedRestaurantPlaces(db, users, places, reviews, findText, findChecked)
             //                             .into('findChecked')
             //                             .insert(findChecked)
             //                             .then(() => {
-
+            //                                  console.log('populated db')
             //                             })
             //                     })
             //             })
             //     })
              })
             
+        })
+}
+
+function seedUsers(db, users) {
+    const preppedUsers = users.map(user => ({
+        ...user,
+        password: bcrypt.hashSync(user.password, 1)
+    }));
+    return db
+        .into('users')
+        .insert(preppedUsers)
+        .then(() => {
+            console.log('users populated')
         })
 }
 
@@ -94,8 +107,19 @@ function makeExpectedPlace(users, places, reviews, findText, findChecked) {
 
 }
 
+function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
+    const token = jwt.sign({ user_id: user.id }, secret, {
+        subject: user.username,
+        algorithm: 'HS256'
+    })
+    return `Bearer ${token}`
+}
+
 module.exports = {
     cleanTables,
     seedRestaurantPlaces,
+    seedUsers,
     makeExpectedPlace,
+    makeAuthHeader,
+    
 }
