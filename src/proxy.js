@@ -1,8 +1,10 @@
-const axios = require('axios')
+const axios = require('axios');
+const express = require('express');
+const proxyRouter = express.Router();
 
 
-module.exports = (term, location) => {
-
+proxyRouter
+.get('/', (req, res) => {
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Accept",
         'Access-Control-Allow-Origin': "*",
@@ -28,4 +30,7 @@ module.exports = (term, location) => {
             }
         })
         .catch(res.error)
-};
+    });
+
+    module.exports = proxyRouter; 
+    
