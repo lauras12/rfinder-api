@@ -4,6 +4,7 @@ const jsonBodyParser = express.json();
 const PlacesService = require('../places/places-service');
 const ReviewsService = require('../reviews/reviews-service');
 const { requireAuth } = require('../middleware/jwt-auth');
+const path = require('path');
 
 reviewsRouter
 .route('/api/:user_id/review')
@@ -19,7 +20,7 @@ reviewsRouter
             }
         }
         //checkedFinds is an array of numbers referring to ids of find text
-        let newFindChecked
+       
         // need to save place first, then review so db assigns placeId and reviewId, then call db to get those ids and create findChecked obj with them
         let newRestaurantPlace = {
             yelpid: yelpId,
@@ -46,8 +47,7 @@ reviewsRouter
             review,
         };
         let savedReview = await ReviewsService.insertNewReview(knexInstance, newReview)
-        console.log(savedReview);
-
+        
         checkedFinds.forEach(el => {
             let newCheckedFind = {
                 userid : userId, 
@@ -63,12 +63,40 @@ reviewsRouter
         })
 
 
+        console.log({newRestaurantPlace, newReview, checkedFinds}, "RETURNING TO CLIENT")
+        console.log(req.originalUrl, `/${savedPlace.id}`)
+        return res.json(201).json({newRestaurantPlace, newReview, checkedFinds}).location(path.posix.join(req.originalUrl, `/${savedPlace.id}`))
+
 
     } catch(err) {
         next(err)
     }
+})
 
-
+reviewsRouter
+.route('/api/:user_id/review/:restaurant_place_id')
+.delete((req,res,next) => {
+    const knexInstance = req.app.get('db');
+    const userId = req.params.user_id;
+    const placeToRemove = req.params.restaurant_place_id ;
+    //should I get by id first to make sure that if place does not exist I have an if statement????
+    PlacesService.deleteReviewedPlace(knexInstance, userId, placeToRemove)
+    .then(() => {
+      //delete the rest of info
+      ReviewsService.deleteReview(knexInstance, userId, placeToRemove)
+      .then(() => {
+          console.log('DONE????')
+          return res.status(204).send('reviewed place deleted')
+        //   ReviewsService.deleteCheckedFind(knexInstance, userId, placeToRemove)
+        //   .then(() => {
+        //       return res.status(204).json('reviewed place deleted')
+        //   })
+        //   .catch(next)
+      })
+      //return res.status(204).send('reviewed place deleted')
+      .catch(next)
+    })
+    .catch(next)
 })
 
 

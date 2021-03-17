@@ -7,55 +7,64 @@ function cleanTables(db) {
     return db.raw(
         `TRUNCATE
             users,
-            place
+            place,
+            review,
+            findText,
+            findChecked,
+            folder
             RESTART IDENTITY CASCADE`
     )
 }
 
 function seedRestaurantPlaces(db, users, places, reviews, findText, findChecked) {
+    //console.log(db, 'DBBBBBBEEEE')
     return db
         .into('users')
         .insert(users)
         .then(() => {
-            db
-                .into('place')
-                .insert(places)
-                .then(() => {
-                    db
-                        .into('review')
-                        .insert(reviews)
-                        .then(() => {
-                            db
-                                .into('findText')
-                                .insert(findText)
-                                .then(() => {
-                                    db
-                                        .into('findChecked')
-                                        .insert(findChecked)
-                                        .then(() => {
+            db.from('users').select('*')
+             .then((users) => {
+                 console.log(users, 'UEEEEEEE')
+            //     return db
+            //     .into('place')
+            //     .insert(places)
+            //     .then(() => {
+            //         return db
+            //             .into('review')
+            //             .insert(reviews)
+            //             .then(() => {
+            //                 return db
+            //                     .into('findText')
+            //                     .insert(findText)
+            //                     .then(() => {
+            //                         return db
+            //                             .into('findChecked')
+            //                             .insert(findChecked)
+            //                             .then(() => {
 
-                                        })
-                                })
-                        })
-                })
+            //                             })
+            //                     })
+            //             })
+            //     })
+             })
+            
         })
 }
 
 function makeExpectedPlace(users, places, reviews, findText, findChecked) {
     let restaurantPlacesList = [];
     for (let i = 0; i < places.length; i++) {
-
+       
         let filteredReviews = reviews.filter(rev => rev.placeId === places[i].id)
-
-        let finalFilteredReviews = [...filteredReviews]
+       
         console.log(filteredReviews, 'Final???????')
         let reviewText = {};
         let reviewDate = {};
         let reviewCheckedFinds = {}
 
         finalFilteredReviews.forEach(rev => {
-            reviewText[rev.review] = true;
-            reviewDate[rev.date] = true;
+            // reviewText[rev.review] = true;
+            // reviewDate[rev.date] = true;
             reviewCheckedFinds[rev.description] = true;
         });
 
@@ -71,13 +80,13 @@ function makeExpectedPlace(users, places, reviews, findText, findChecked) {
             location_zip: places[i].location_zip,
             location_st: places[i].location_st,
             phone: places[i].phone,
-            displayPhone: places[i].phone,
+            displayphone: places[i].phone,
             userId: places[i].userId,
             folderId: places[i].folderId,
             restaurant_reviews_count: places[i].restaurant_reviews_count,
-            review: Object.keys(reviewText),
-            reviewDate: Object.keys(reviewDate),
-            checkedFinds: Object.keys(reviewCheckedFinds)
+            review: filteredReviews.map(rev => rev.review),
+            reviewDate:filteredReviews.map(rev => rev.date),
+            checkedfinds: Object.keys(reviewCheckedFinds)
         })
     }
     console.log(restaurantPlacesList)
@@ -89,4 +98,4 @@ module.exports = {
     cleanTables,
     seedRestaurantPlaces,
     makeExpectedPlace,
-} 
+}

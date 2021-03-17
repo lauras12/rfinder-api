@@ -27,6 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.2",
     "morgan": "^1.10.0",
+    "path": "^0.12.7",
     "pg": "^8.5.1",
     "postgrator-cli": "^4.0.0",
     "router": "^1.3.5"
