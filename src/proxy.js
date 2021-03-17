@@ -4,7 +4,10 @@ const proxyRouter = express.Router();
 
 
 proxyRouter
-.get('/', (req, res) => {
+.get('/yelp/', (req, res) => {
+    const { term, location } = req.query;
+    console.log(term, location, 'WORKING?')
+
     const headers = {
         "Access-Control-Allow-Headers": "Content-Type, Accept",
         'Access-Control-Allow-Origin': "*",
