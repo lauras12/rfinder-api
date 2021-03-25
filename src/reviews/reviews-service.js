@@ -1,3 +1,4 @@
+
 const ReviewsService = {
     getAllReviews: (knex, placeId) => {
         return knex
@@ -98,10 +99,10 @@ const ReviewsService = {
 
     },
     getReviewCountPerPlace: (knex, yelp_id) => {
-        return knex.from('review').select('*').where({yelp_id: yelp_id})
-        .then(rows => {
-            return rows;
-        });
+        return knex.from('review').select('*').where({ yelp_id: yelp_id })
+            .then(rows => {
+                return rows;
+            });
     },
 
 
@@ -120,35 +121,34 @@ const ReviewsService = {
     },
 
     updateReview: (knex, userId, placeId, updatedFields) => {
-        return knex('review').where({ userid: userId, place_id: placeId }).update(updatedFields).returning('*')
+        return knex('review').where({ userid: userId, place_id: placeId }).delete()
+            .then(() => {
+                return knex('review').where({ userid: userId, place_id: placeId }).insert(updatedFields).returning('*')
+            })
             .then(rows => {
                 return rows[0];
             });
     },
 
     updateFindChecked: (knex, userId, placeId, updatedList) => {
-        console.log(updatedList, 'IN THUMB SERVICE')
         return knex('findchecked').where({ userid: userId, place_id: placeId }).delete()
             .then((deletedFind) => {
-                console.log(deletedFind, 'DELETED?')
                 return knex.into('findchecked').where({ userid: userId, place_id: placeId }).insert(updatedList).returning('*')
             })
             .then(rows => {
                 return rows;
-        });//insert can insert one obj or an array /// dont nest THENS!
+            });//insert can insert one obj or an array /// dont nest THENS!
     },
 
     deleteReview: (knex, userId, placeToRemove) => {
         return knex.from('review').select('*').where({ userid: userId, place_id: placeToRemove }).del()
             .then((rows) => {
-                console.log(rows, '???????.........222222222>>>>?????????')
             });
     },
 
     deleteCheckedFind: (knex, userId, placeToRemove) => {
         return knex.from('findchecked').select('*').where({ userid: userId, place_id: placeToRemove }).del()
             .then((rows) => {
-                console.log(rows, '???????>>>>>>>?????????')
             });
     }
 

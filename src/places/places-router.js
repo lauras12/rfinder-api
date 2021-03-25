@@ -5,20 +5,20 @@ const PlacesService = require('./places-service');
 const ReviewsService = require('../reviews/reviews-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
-placesRouter // gets all restaurant find reviewed places with full info
+// gets all restaurant find reviewed places with full info
+placesRouter
     .route('/api/')
     .all(async (req, res, next) => {
         try {
             res.placesReviewed = [];
-            const knexInstance = req.app.get('db')
+            const knexInstance = req.app.get('db');
             const places = await PlacesService.getAllRestaurantPlaces(knexInstance);
             const reviewedPlacesIds = await PlacesService.getAllUserPlaces(knexInstance);
-            //need to filter here so that client doesn't show places which reviews has been deleted/
             let filteredPlaces = [];
             places.filter(pl => {
                 reviewedPlacesIds.filter(id => {
                     if (pl.id === id) {
-                        filteredPlaces.push(pl)
+                        filteredPlaces.push(pl);
                     };
                 });
                 return filteredPlaces;
@@ -59,16 +59,13 @@ placesRouter // gets all restaurant find reviewed places with full info
                         location_zip,
                         location_st,
                         display_phone,
-                        restaurant_reviews_count: reviews.length,
-                        review: Object.keys(reviewText),
+                        review: Object.keys(reviewText)[0] || '',
                         reviewDate: Object.keys(reviewDate),
-                        reviewCategory: Object.keys(reviewCategory),
-                        checkedFinds: Object.keys(reviewCheckedFinds)
+                        checkedFinds: Object.keys(reviewCheckedFinds),
+                        category: Object.keys(reviewCategory)[0] || '',
                     });
                 };
-
             };
-
             next();
         } catch (err) {
             next(err);
@@ -77,7 +74,6 @@ placesRouter // gets all restaurant find reviewed places with full info
     .get((req, res, next) => {
         res.status(200).json(res.placesReviewed)
     });
-
 
 placesRouter
     //gets restaurant reviewed places by user with full info
@@ -111,7 +107,7 @@ placesRouter
                         const {
                             id, yelp_id, name, img_url, url, yelp_rating,
                             location_str, location_city, location_zip,
-                            location_st, display_phone, userid, restaurant_reviews_count,
+                            location_st, display_phone, userid,
                         } = userPlaces[i];
 
                         res.userPlacesReviewed.push({
@@ -127,11 +123,10 @@ placesRouter
                             location_st,
                             display_phone,
                             userid,
-                            restaurant_reviews_count,
-                            review: Object.keys(reviewText),
+                            review: Object.keys(reviewText)[0] || '',
                             reviewDate: Object.keys(reviewDate),
-                            reviewCategory: Object.keys(reviewCategory),
-                            checkedFinds: Object.keys(reviewCheckedFinds)
+                            checkedFinds: Object.keys(reviewCheckedFinds),
+                            category: Object.keys(reviewCategory)[0] || '',
                         });
                     };
                 };
@@ -144,7 +139,7 @@ placesRouter
         }
     })
     .get((req, res, next) => {
-        res.status(200).json(res.userPlacesReviewed)
+        res.status(200).json(res.userPlacesReviewed);
     });
 
 
@@ -162,11 +157,10 @@ placesRouter //gets by id reviewed place with full info
             if (!foundPlace) {
                 return res.status(400).json({ error: { message: `User with id ${user_id} did not review place with id ${place_id}` } });
             }
-            
+
             res.place = foundPlace;
 
             let foundReviews = await ReviewsService.getReviewByPlaceId(knexInstance, user_id, place_id);
-            
             if (foundReviews) {
                 let reviewText = {};
                 let reviewCheckedFinds = {};
@@ -179,13 +173,12 @@ placesRouter //gets by id reviewed place with full info
                 });
                 res.fullReviewedPlace = {
                     ...res.place,
-                    review: Object.keys(reviewText),
+                    review: Object.keys(reviewText)[0] || '',
                     checkedFinds: Object.keys(reviewCheckedFinds),
-                    category: Object.keys(reviewCategory),
+                    category: Object.keys(reviewCategory)[0] || '',
                 };
             };
             next();
-
         } catch (err) {
             next(err);
         }

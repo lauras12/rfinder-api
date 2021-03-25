@@ -30,6 +30,5 @@ const UserService = {
         return knex.insert(newUser).into('users').returning('*')
         .then(([user]) => user)
     }
-
 }
-module.exports = UserService; 
+module.exports = UserService;

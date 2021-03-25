@@ -7,7 +7,6 @@ const path = require('path');
 userRouter
 .post('/api/register', jsonBodyParser, (req,res,next) => {
     for (const field of ['fullname', 'username', 'password']) {
-        console.log(field, '????????????', req.body[field])
         if(!req.body[field]) {
             return res.status(400).json({error: {message: `Missing ${field}`}})
         }
@@ -15,7 +14,7 @@ userRouter
 
     const {fullname, username, password} = req.body;
     const passwordError = UserService.validatePassword(password);
-
+   
     if(passwordError) {
         return res.status(400).json({ error: {message: passwordError }})
     }
@@ -45,4 +44,4 @@ userRouter
     .catch(next)
 })
 
-module.exports = userRouter 
+module.exports = userRouter

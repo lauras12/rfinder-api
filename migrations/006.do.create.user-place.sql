@@ -2,4 +2,4 @@ DROP TABLE IF EXISTS userPlace;
 CREATE TABLE userPlace (
     userid INTEGER REFERENCES users(id) ON DELETE SET NULL,
     reviewed_place_id INTEGER REFERENCES place(id) ON DELETE CASCADE NULL
-); 
+);

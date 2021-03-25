@@ -40,7 +40,6 @@ describe('places endpoints', function () {
                     .get('/api/')
                     .expect(200)
                     .expect(res => {
-                        console.log(res.body[0])
                         res.body[0] === expectedPlace;
                     });
             });
@@ -193,7 +192,6 @@ describe('places endpoints', function () {
                     location_st,
                     display_phone,
                     userid: user.id,
-                    restaurant_reviews_count,
                     category: testNewReview.place_category,
                     review: testNewReview.review,
                     checkedFinds: testFindsChecked
@@ -205,7 +203,6 @@ describe('places endpoints', function () {
                     .send(testNewPlaceReq)
                     .expect(201)
                     .expect(res => {
-                        console.log(res.body)
                         expect(res.body.savedPlace).to.have.property('id');
                         expect(res.body.savedPlace.yelp_id).to.eql(testNewPlaceReq.yelp_id);
                         expect(res.body.savedPlace.name).to.eql(testNewPlaceReq.name);
@@ -216,7 +213,6 @@ describe('places endpoints', function () {
                         expect(res.body.savedPlace.location_city).to.eql(testNewPlaceReq.location_city);
                         expect(res.body.savedPlace.location_st).to.eql(testNewPlaceReq.location_st);
                         expect(res.body.savedPlace.display_phone).to.eql(testNewPlaceReq.display_phone);
-                        expect(res.body.savedPlace.restaurant_reviews_count).to.eql(testNewPlaceReq.restaurant_reviews_count);
                         
                         
                         expect(res.body.savedReview).to.have.property('id');
@@ -258,7 +254,6 @@ describe('places endpoints', function () {
         it('inserts new review to a saved place in db', () => {
             const user = testUsers[2];
             const place = testPlaces[2];
-            console.log(place)
 
             const testNewUserPlace = {
                 userid: user.id,
@@ -294,7 +289,6 @@ describe('places endpoints', function () {
                 location_st,
                 display_phone,
                 userid: user.id,
-                restaurant_reviews_count,
                 category: testNewReview.place_category,
                 review: testNewReview.review,
                 checkedFinds: testFindsChecked
@@ -305,24 +299,19 @@ describe('places endpoints', function () {
                 .send(testNewPlaceReq)
                 .expect(201)
                 .expect(res => {
-                    console.log(res.body, "BODY")
-           
-
                     expect(res.body.savedReview).to.have.property('id');
-                    // expect(res.body.newReview.userid).to.eql(testNewPlaceReq.userid);
-                    // expect(res.body.newReview.place_id).to.eql(testNewPlaceReq.id);
-                    // expect(res.body.newReview.place_category).to.eql(testNewPlaceReq.category);
-                    // expect(res.body.newReview.review).to.eql(testNewPlaceReq.review);
+                    expect(res.body.savedReview.userid).to.eql(testNewPlaceReq.userid);
+                    expect(res.body.savedReview.place_id).to.eql(place.id);
+                    expect(res.body.savedReview.place_category).to.eql(testNewPlaceReq.category);
+                    expect(res.body.savedReview.review).to.eql(testNewPlaceReq.review);
 
                     expect(res.body.savedFinds).to.eql(testNewPlaceReq.checkedFinds)
                 })
-            //this is in response body that router sents : newReview, checkedFinds 
       
         })
     })
 
     describe('PATCH /api/edit/:restaurant_place_id', () => {
-        
            
         beforeEach('insert users', () => {
             const verifiedUsers = testUsers.map(user => ({
@@ -384,12 +373,11 @@ describe('places endpoints', function () {
                     checkedFinds: testFindsChecked
                 }
                 return supertest(app)
-                .post(`/api/edit/${place.id}`)
+                .patch(`/api/edit/${place.id}`)
                 .set('Authorization', helpers.makeAuthHeader(user))
                 .send(testUpdatedPlaceReq)
                 .expect(201)
                 .expect(res => {
-                    console.log(res.body);
                     expect(res.body.savedReview).to.have.property('id');
                     expect(res.body.savedReview.userid).to.eql(testUpdatedPlaceReq.userid);
                     expect(res.body.savedReview.place_id).to.eql(testUpdatedPlaceReq.id);
@@ -415,3 +403,7 @@ describe('places endpoints', function () {
         })
     })
 })
+
+
+
+

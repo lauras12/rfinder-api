@@ -4,5 +4,5 @@ module.exports = {
     DATABASE_URL:process.env.DATABASE_URL || 'postgresql://lsikora@localhost/rfinder-api',
     TEST_DATABASE_URL: process.env.TEST_DATABASE_URL|| 'postgresql://lsikora@localhost/rfinder-api-test',
     JWT_SECRET: process.env.JWT_SECRET || 'finds',
-    CLIENT_ORIGIN: 'https://rfinder-app.now.sh/'
+    CLIENT_ORIGIN: 'https://rfinder-app.vercel.app/'
 }

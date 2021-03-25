@@ -4,7 +4,6 @@ const config = require('../config');
 
 const AuthService = {
     getUserWithUserName(knex, username) {
-        // knex('users').then(users => console.log('<<<<<<<<<<<<',users, 'KNEXXXX'))
         return knex.from('users')
         .where({username})
         .first()
@@ -21,6 +20,7 @@ const AuthService = {
     verifyJWT(token) {
         return jwt.verify(token, config.JWT_SECRET, {algorithms: ['HS256']})
     },
+   
 }
 
 module.exports = AuthService;
