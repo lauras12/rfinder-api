@@ -27,7 +27,7 @@ reviewsRouter
             if (existingReviewByUser) {
                 return res.status(400).send({ error: { message: `your review already exists` } });
             }
-            //first check if there's a place of this id in GREEN db, if not we will save the place info, but it it already exists we will just add another review and checked finds
+            //first check if there's a place of this id in db, if not we will save the place info, but it it already exists we will just add another review and checked finds
             const existingPlace = await PlacesService.getPlaceById(knexInstance, yelpId);
             if (!existingPlace) {
                 let newRestaurantPlace = {

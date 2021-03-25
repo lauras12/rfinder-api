@@ -1,6 +1,6 @@
 BEGIN;
 
-INSERT INTO thumbChecked (userid, place_id, review_id, find)
+INSERT INTO findChecked (userid, place_id, review_id, find)
 VALUES
 (1, 1, 1, 1),
 (1, 1, 1, 3),
