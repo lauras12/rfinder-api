@@ -2,11 +2,11 @@ BEGIN;
 
 INSERT INTO findText (description)
 VALUES
-('No plastic'),
+('Good beer'),
 ('Variety of beer'),
-('No plastic bottled drinks'),
+('Great service'),
 ('Great coffee'),
-('Recycle and compost bins inside'),
+('Contactless'),
 ('Great service'),
 ('Contactless'),
 ('Great vibes and seating arrangments'),
