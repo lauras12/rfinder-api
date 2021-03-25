@@ -2,9 +2,7 @@ const dataHelpers = require('./test-data');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
 function cleanTables(db) {
-
     return db.raw(
         `TRUNCATE
             users,
@@ -47,10 +45,7 @@ function seedRestaurantPlaces1(db, users, places, userPlaces, reviews, findText,
                 .into('findchecked')
                 .insert(findChecked)
                 .then(() => {
-                    // return db
-                    // .select('*').from('users','place','userplace','review','findtext','findchecked')
-                    // .then(users => console.log(users, 'ARE WE INSIDE DB??????'))
-                    console.log('db populated here////?????');
+                    console.log('db should be here');
                 });
         });
 
@@ -60,7 +55,6 @@ function seedRestaurantPlaces1(db, users, places, userPlaces, reviews, findText,
 function seedRestaurantPlaces2(db, users, places, reviews, userPlaces, findText, findChecked) {
 
     const verifiedUsers = users.map(user => {
-        //console.log(user, 'USER IN VERIFING')
         return ({
             ...user,
             password: bcrypt.hashSync(user.password, 1)
@@ -95,10 +89,7 @@ function seedRestaurantPlaces2(db, users, places, reviews, userPlaces, findText,
                 .into('findchecked')
                 .insert(findChecked)
                 .then(() => {
-                    // return db
-                    // .select('*').from('findchecked')
-                    // .then(users => console.log(users, 'ARE WE INSIDE DB??????'))
-                    console.log('db populated here////?????');
+                    console.log('db here?');
                 });
         });
 
@@ -143,9 +134,6 @@ function makeExpectedPlaceReviews(db, user, place, userPlaces, reviews, checkedF
 }
 
 
-
-
-
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
     const token = jwt.sign({ user_id: user.id }, secret, {
         subject: user.username,
@@ -161,5 +149,4 @@ module.exports = {
     seedRestaurantPlaces2,
     makeExpectedPlaceReviews,
     makeAuthHeader,
-
 }
