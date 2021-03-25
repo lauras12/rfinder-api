@@ -123,10 +123,9 @@ function makeExpectedPlaceReviews(db, user, place, userPlaces, reviews, checkedF
         location_st: place.location_st,
         display_phone: place.display_phone,
         userid: user.id,
-        restaurant_reviews_count: place.restaurant_reviews_count,
         reviewed_place_id: place.id,
-        review: [filteredReview.review,],
-        category: [filteredReview.place_category,],
+        review: filteredReview.review,
+        category: filteredReview.place_category,
         checkedFinds: filteredFindsDescriptionText,
     };
 
