@@ -8,6 +8,7 @@ userRouter
 .post('/api/register', jsonBodyParser, (req,res,next) => {
     for (const field of ['fullname', 'username', 'password']) {
         if(!req.body[field]) {
+            console.log('working1')
             return res.status(400).json({error: {message: `Missing ${field}`}})
         }
     }
@@ -16,6 +17,7 @@ userRouter
     const passwordError = UserService.validatePassword(password);
    
     if(passwordError) {
+        console.log('working2')
         return res.status(400).json({ error: {message: passwordError }})
     }
 
@@ -23,6 +25,7 @@ userRouter
     UserService.hasUserWithUserName(knexInstance, username)
     .then(takenUser => {
         if(takenUser) {
+            console.log('working3')
             return res.status(400).json({error: {message:`Username already taken` }})
         }
         return UserService.hashPassword(password)
