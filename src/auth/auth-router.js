@@ -18,18 +18,26 @@ authRouter
     console.log(knexInstance);
     AuthService.getUserWithUserName(knexInstance, loginUser.username)
     .then(dbUser => {
+        console.log('GOT USER');
+        console.dir(dbUser);
         if(!dbUser) {
             return res.status(400).send({error: {message: 'Incorrect user_name or password'}});
         }
         return AuthService.comparePasswords(loginUser.password, dbUser.password)
         .then(compareMatch => {
+            console.log('GOT PASSWORD');
+            console.dir(dbUser.password);
             if(!compareMatch) {
                 return res.status(400).json({error: {message: 'Incorrect user_name or password'}});
             }
         
             const subject = dbUser.username;
             const payload = { userId : dbUser.id };
-            return res.json({authToken: AuthService.createJWT(subject, payload)});
+            const authToken = AuthService.createJWT(subject, payload);
+            console.log('GOT TOKEN');
+            console.dir(authToken);
+            return res.json({authToken});
+            //return res.json({authToken: AuthService.createJWT(subject, payload)});
         });
     })
     .catch(error => { console.log('ERROR'); console.dir(error); });
