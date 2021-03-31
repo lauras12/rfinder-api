@@ -7,6 +7,7 @@ authRouter
 .post('/api/login', jsonBodyParser, (req, res, next) => {
     const {username, password} = req.body;
     const loginUser = {username, password};
+    console.log('LOGIN');
     for (const [key,value] of Object.entries(loginUser)){
         if(value == null) {
              return res.status(400).json({ error: {message: `Missing ${key}`}});
@@ -14,6 +15,7 @@ authRouter
     };
 
     const knexInstance = req.app.get('db');
+    console.log(knexInstance);
     AuthService.getUserWithUserName(knexInstance, loginUser.username)
     .then(dbUser => {
         if(!dbUser) {
@@ -30,7 +32,7 @@ authRouter
             return res.json({authToken: AuthService.createJWT(subject, payload)});
         });
     })
-    .catch(next);
+    .catch(error => { console.log('ERROR'); console.dir(error); });
 });
 
 module.exports = authRouter;
