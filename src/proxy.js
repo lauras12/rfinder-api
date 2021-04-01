@@ -3,7 +3,7 @@ const express = require('express');
 const proxyRouter = express.Router();
 
 proxyRouter
-.get('/yelp/', (req, res) => {
+.get('/api/yelp/', (req, res) => {
     const { term, location } = req.query;
 
     const headers = {
