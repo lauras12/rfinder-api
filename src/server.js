@@ -8,7 +8,7 @@ const { PORT, DATABASE_URL } = require('./config');
 const db = knex({
   client: 'pg',
   connection: DATABASE_URL,
-  ssl: (process.env.NODE_ENV === "production")
+  ssl: { rejectUnauthorized: false }
 })
 console.log(process.env.NODE_ENV)
 app.set('db', db);
