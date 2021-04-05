@@ -7,6 +7,7 @@ const db = knex({
   connection: DATABASE_URL,
   ssl: (process.env.NODE_ENV === "production")
 })
+console.log(process.env.NODE_ENV)
 app.set('db', db);
 
 
