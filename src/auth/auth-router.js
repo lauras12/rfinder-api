@@ -27,9 +27,7 @@ authRouter
         .then(compareMatch => {
             console.log('GOT PASSWORD');
             console.dir(dbUser.password);
-            if(!compareMatch) {
-                return res.status(400).json({error: {message: 'Incorrect user_name or password'}});
-            }
+            
         
             const subject = dbUser.username;
             const payload = { userId : dbUser.id };
@@ -40,7 +38,11 @@ authRouter
             //return res.json({authToken: AuthService.createJWT(subject, payload)});
         });
     })
-    .catch(error => { console.log('ERROR'); console.dir(error); });
+    .catch(error => { 
+        console.log('ERROR'); console.dir(error); 
+        return res.status(400).json({error: {message: 'Incorrect user_name or password'}});
+    });
+    
 });
 
 module.exports = authRouter;
