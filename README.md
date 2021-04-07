@@ -8,6 +8,17 @@ Restaurant Finder is a place where users can login and search for places to eat 
 
 This application was created to allow users to save and rate their favorite places.  Being able to categorize different places as "having good vibes" or "having a great beer list and outdoor patio" are just some of the many ways users can categorize their saves venues. 
   
+<img src='https://i.postimg.cc/4NRjXDWK/home.png' width ='400' > | <img src='https://i.postimg.cc/j2P9zcSd/login.png' width='400' > 
+<br>
+<img src='https://i.postimg.cc/BZKd9SB9/register.png' width='400' >  | <img src='https://i.postimg.cc/50ZTYT1R/search.png' width ='400' > 
+<br>
+<img src='https://i.postimg.cc/BZKd9SB9/register.png' width='400' > 
+<img src='https://i.postimg.cc/50ZTYT1R/search.png' width ='400' > 
+<br>
+<img src='https://i.postimg.cc/65VgqMPM/selectcat.png' width='400' > 
+<img src='https://i.postimg.cc/JnyShMwX/chooserest.png' width ='400' > 
+<img src='https://i.postimg.cc/T3RSDrMf/createreview.png' width ='400' > 
+<br>
 
 ## ENDPOINTS AND EXPECTED DATA
 ### Yelp Proxy Endpoint
