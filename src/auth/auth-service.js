@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
+//auth serviec objects
 const AuthService = {
     getUserWithUserName(knex, username) {
         return knex.from('users')

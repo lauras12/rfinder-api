@@ -2,7 +2,7 @@ const express = require('express');
 const authRouter = express.Router();
 const jsonBodyParser = express.json();
 const AuthService = require('./auth-service');
-
+ //login router
 authRouter
 .post('/api/login', jsonBodyParser, (req, res, next) => {
     const {username, password} = req.body;

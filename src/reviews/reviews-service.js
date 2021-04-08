@@ -1,4 +1,4 @@
-
+/* review constants fordb */
 const ReviewsService = {
     getAllReviews: (knex, placeId) => {
         return knex
@@ -62,7 +62,7 @@ const ReviewsService = {
                 return rows;
             })
     },
-
+/* review by id search */
     getReviewByPlaceId: (knex, userId, placeId) => {
         return knex
             .from('review AS rev')

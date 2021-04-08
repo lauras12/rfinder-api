@@ -8,6 +8,7 @@ const parse = require('pg-connection-string').parse;
 const pgconfig = parse(DATABASE_URL);
 pgconfig.ssl = { rejectUnauthorized: false };
 
+/* server db */
 const db = knex({
   client: 'pg',
   connection: pgconfig

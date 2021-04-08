@@ -12,6 +12,7 @@ proxyRouter
         'Access-Control-Allow-Methods': "GET,HEAD"
     };
     
+    /* access to proxy api */
     axios({
         method: 'get',
         url: `https://api.yelp.com/v3/businesses/search?term=${term}&location=${location}`,

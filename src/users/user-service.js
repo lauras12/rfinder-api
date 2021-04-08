@@ -5,7 +5,7 @@ const UserService = {
     hasUserWithUserName: (knex, username) => {
         return knex.from('users').where({username}).first().then(user => !!user)
     },
-
+/* password requirments */
     validatePassword: (password) => {
         if (password.length < 8) {
             return 'Password must be longer than 8 characters'

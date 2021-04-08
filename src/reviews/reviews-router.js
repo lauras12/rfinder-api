@@ -8,7 +8,7 @@ const path = require('path');
 const validUrl = require('valid-url');
 
 reviewsRouter
-    //creates restaurant-reviewed place in db that consists of yelp-place-data recorded into 'place' table and review section recorded into 'review' and 'findChecked' tables
+    /* creates restaurant-reviewed place in db that consists of yelp-place-data recorded into 'place' table and review section recorded into 'review' and 'findChecked' table*/
     .route('/api/:place_id/review')
     .all(requireAuth)
     .post(jsonBodyParser, async (req, res, next) => {

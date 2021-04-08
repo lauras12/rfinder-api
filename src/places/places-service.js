@@ -1,4 +1,4 @@
-
+/* places services object */
 const PlacesService = {
     getAllRestaurantPlaces: knex => (
         knex.from('place AS pl').select('*')

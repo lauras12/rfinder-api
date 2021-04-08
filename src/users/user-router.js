@@ -5,6 +5,7 @@ const UserService = require('./user-service');
 const path = require('path');
 
 userRouter
+/* creating user */
 .post('/api/register', jsonBodyParser, (req,res,next) => {
     for (const field of ['fullname', 'username', 'password']) {
         if(!req.body[field]) {

@@ -1,5 +1,5 @@
 const AuthService = require('../auth/auth-service');
-
+//auth middleware
 function requireAuth(req,res,next) {
     const authToken = req.get('Authorization') || '';
     

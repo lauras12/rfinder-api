@@ -143,7 +143,7 @@ placesRouter
     });
 
 
-placesRouter //gets by id reviewed place with full info
+placesRouter // gets by id reviewed place with full info
     .route('/api/place/:place_id')
     .all(requireAuth)
     .all(async (req, res, next) => {
